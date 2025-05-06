@@ -30,7 +30,9 @@ for i in range(0, 360):
 
     circle_points[i,0:2] = [y0 + rx, z0 + ry]
 
-print(circle_points)
+
+
+
 fig, ax = plt.subplots()
 plt.xlabel('Y')
 plt.ylabel('Z')
