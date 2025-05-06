@@ -5,6 +5,7 @@ import math
 
 data = pd.read_csv('slice_csv_data.csv')
 
+print(data)
 z_low = -0.53339
 z_high = 0.64874
 y_low = 0
@@ -40,5 +41,19 @@ ax.scatter(data['Y'], data['Z'], c='blue', s=1)
 ax.scatter(circle_points[:,0], circle_points[:,1], c='red', s=2 )
 
 
+
+
+
+hstep = 0.1
+Ly = abs(y_high - y_low)
+Lz = abs(z_high - z_low)
+ny = int(round(Ly / hstep))
+nz = int(round(Lz / hstep))
+y = np.linspace(y_low, y_high, ny)
+z = np.linspace(z_low, z_high, nz)
+
+yg, zg = np.meshgrid(y, z)
+
+plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
 
 plt.show()
