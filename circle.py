@@ -12,7 +12,7 @@ y_low = 0
 y_high = 1.48716
 circle_radius = 0.1
 
-
+#uniform meshgrid
 hstep = 0.1
 Ly = abs(y_high - y_low)
 Lz = abs(z_high - z_low)
@@ -64,4 +64,8 @@ ax.scatter(circle_points[:,0], circle_points[:,1], c='red', s=2 )
 
 plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
 
-plt.show()
+#circle generator check
+
+
+
+plt.show()                                                                                                                                                                                                           
