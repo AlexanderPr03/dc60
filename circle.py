@@ -13,13 +13,19 @@ y_high = 1.48716
 circle_radius = 0.1
 
 #uniform meshgrid
+ysafe_high = y_high - circle_radius
+ysafe_low = y_low + circle_radius
+zsafe_high = z_high - circle_radius
+zsafe_low = z_low + circle_radius
 hstep = 0.1
-Ly = abs(y_high - y_low)
-Lz = abs(z_high - z_low)
+Ly = abs(ysafe_high - ysafe_low)
+Lz = abs(zsafe_high - zsafe_low)
 ny = int(round(Ly / hstep))
 nz = int(round(Lz / hstep))
-y = np.linspace(y_low, y_high, ny)
-z = np.linspace(z_low, z_high, nz)
+y = np.linspace(ysafe_low, ysafe_high, ny)
+z = np.linspace(zsafe_low, zsafe_high, nz)
+
+
 
 yg, zg = np.meshgrid(y, z)
 
