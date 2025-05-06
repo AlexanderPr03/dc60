@@ -43,10 +43,18 @@ for i in range(0, 360):
 
     circle_points[i,0:2] = [y0 + rx, z0 + ry]
 
-sectors = np.zeros((6, 2))
+sector_angles = np.zeros((6, 2))
 for i in range(0, 360, 60):
     rad = math.radians(i)
-    sectors[int(i/60)] = [i, (i+60) % 360]
+    sector_angles[int(i/60)] = [i, (i+60) % 360]
+
+sectors = []
+for (a1,a2) in sector_angles:
+        distance = ((data['Y'] - random_point['Y'].values[0]) ** 2 + (data['Z'] - random_point['Z'].values[0]) ** 2)
+        criteria1 = (distance < circle_radius)
+        r1 = (y0 + circle_radius * math.cos(math.radians((a1))), z0 + circle_radius * math.sin(math.radians((a1))))
+        r2 = (y0 + circle_radius * math.cos(math.radians((a2))), z0 + circle_radius * math.sin(math.radians((a2))))
+
 
 
 
