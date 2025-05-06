@@ -4,9 +4,7 @@ import matplotlib.pyplot as plt
 
 data = pd.read_csv('slice_csv_data.csv')
 
-<<<<<<< HEAD
 print(data)
-=======
 z_low = -0.53339
 z_high = 0.64874
 y_low = 0
@@ -21,5 +19,18 @@ data = data[criterion]
 fig, ax = plt.subplots()
 ax.scatter(data['Y'], data['Z'], c='blue', s=1)
 
+
+
+hstep = 0.1
+Ly = abs(y_high - y_low)
+Lz = abs(z_high - z_low)
+ny = int(round(Ly / hstep))
+nz = int(round(Lz / hstep))
+y = np.linspace(y_low, y_high, ny)
+z = np.linspace(z_low, z_high, nz)
+
+yg, zg = np.meshgrid(y, z)
+
+plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
+
 plt.show()
->>>>>>> 3c14b98aa2f689a53592fb8e21970efc713f4399
