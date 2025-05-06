@@ -13,6 +13,18 @@ y_high = 1.48716
 circle_radius = 0.1
 
 
+hstep = 0.1
+Ly = abs(y_high - y_low)
+Lz = abs(z_high - z_low)
+ny = int(round(Ly / hstep))
+nz = int(round(Lz / hstep))
+y = np.linspace(y_low, y_high, ny)
+z = np.linspace(z_low, z_high, nz)
+
+yg, zg = np.meshgrid(y, z)
+
+
+
 criterion = (data['Y'] > y_low) & (data['Y'] < y_high) & (data['Z'] > z_low) & (data['Z'] < z_high)
 data = data[criterion]
 random_point = data.sample()
@@ -26,11 +38,15 @@ for i in range(0, 360):
     rad = math.radians(i)
     rx = math.cos(rad) * circle_radius
     ry = math.sin(rad) * circle_radius
-    print(circle_points[i].shape)
+    # print(circle_points[i].shape)
 
 
     circle_points[i,0:2] = [y0 + rx, z0 + ry]
 
+sectors = np.zeros((6, 2))
+for i in range(0, 360, 60):
+    rad = math.radians(i)
+    sectors[int(i/60)] = [i, (i+60) % 360]
 
 
 
@@ -44,15 +60,7 @@ ax.scatter(circle_points[:,0], circle_points[:,1], c='red', s=2 )
 
 
 
-hstep = 0.1
-Ly = abs(y_high - y_low)
-Lz = abs(z_high - z_low)
-ny = int(round(Ly / hstep))
-nz = int(round(Lz / hstep))
-y = np.linspace(y_low, y_high, ny)
-z = np.linspace(z_low, z_high, nz)
 
-yg, zg = np.meshgrid(y, z)
 
 plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
 
