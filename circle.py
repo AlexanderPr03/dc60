@@ -2,18 +2,23 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
+import seaborn as sns
 from math import pi as pi
 from math import pow as pow
 
+
+
+sns.set_theme()
+
 data = pd.read_csv('slice_csv_data.csv')
 
-
 z_low = -0.53339
+step = 0.0000001
 z_high = 0.64874
 y_low = 0
 y_high = 1.48716
 circle_radius = 0.1
-
+make_heatmap = False # Set to false to run the code faster if we don't need the heatmap
 #uniform meshgrid
 ysafe_high = y_high - circle_radius
 ysafe_low = y_low + circle_radius
@@ -34,14 +39,12 @@ plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
 
 criterion = (data['Y'] > y_low) & (data['Y'] < y_high) & (data['Z'] > z_low) & (data['Z'] < z_high)
 data = data[criterion]
-random_point = data.sample()
 
-
-
-
-y0 = random_point['Y'].values[0]
-z0 = random_point['Z'].values[0]
-
+print(yg)
+y0 = yg[3][3]
+z0 = zg[3][3]
+# print(y0)
+# print(z0)
 criterion_2 = (data['Y'] > y0 - circle_radius) & (data['Y'] < y0 + circle_radius) & (data['Z'] > z0 - circle_radius) & (data['Z'] < z0 + circle_radius)
 data_circle = data[criterion_2].copy()
 circle_points = np.zeros(shape=(360,2))
@@ -65,11 +68,11 @@ sectors = [[],[],[],[],[],[]]
 for (index, row) in data_circle.iterrows():
     i=0
     for (a1,a2) in sector_angles:
-        distance = math.sqrt((row['Y'] - random_point['Y'].values[0]) ** 2 + (row['Z'] - random_point['Z'].values[0]) ** 2)
+        distance = math.sqrt((row['Y'] - y0) ** 2 + (row['Z'] - z0) ** 2)
         # Check if the distance from the center of the circle is lower than the radius of the circle
         criteria_1 = (distance < circle_radius)
 
-        distance = np.array([row['Y'] - random_point['Y'].values[0], row['Z'] - random_point['Z'].values[0] ])
+        distance = np.array([row['Y'] - y0, row['Z'] - z0 ])
 
         # p1 = (y0 + circle_radius * math.cos(math.radians((a1))), z0 + circle_radius * math.sin(math.radians((a1))))
         # p2 = (y0 + circle_radius * math.cos(math.radians((a2))), z0 + circle_radius * math.sin(math.radians((a2))))
@@ -127,17 +130,32 @@ ax.scatter([y0], [z0], c='black', s=10, marker='x')
 ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
 plt.title(f'(Y={y0:.3f}, Z={z0:.3f})')
 plt.tight_layout()
-
-
-
-
-
 plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
+plt.show()
 
-#circle generator check
+#TRYING TO MAKE A HEATMAP OF PRESSURES
+if (make_heatmap):
+    data_circle['Y_bin'] = np.round(data_circle['Y'] / step) * step
+    data_circle['Z_bin'] = np.round(data_circle['Z'] / step) * step
+
+    pressure_matrix = data_circle.pivot_table(index='Z', columns='Y', values='Total Pressure', aggfunc='mean')
+    print(pressure_matrix)
+    # Plot
+    plt.figure(figsize=(10, 8))
+
+    mask = pressure_matrix.isna()
+
+    sns.heatmap(pressure_matrix, mask=mask, cmap='viridis')
+    plt.title('Total Pressure')
+    plt.xlabel('Y')
+    plt.ylabel('Z')
+    plt.show()
 
 
+<<<<<<< HEAD
 print(data)
 
 
 plt.show()                                                                                                                                                                                                           
+=======
+>>>>>>> e161fcf0b59b83fcec5d031a85fb16130ef20175
