@@ -152,10 +152,3 @@ if (make_heatmap):
     plt.show()
 
 
-<<<<<<< HEAD
-print(data)
-
-
-plt.show()                                                                                                                                                                                                           
-=======
->>>>>>> e161fcf0b59b83fcec5d031a85fb16130ef20175
