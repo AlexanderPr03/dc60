@@ -29,6 +29,8 @@ z = np.linspace(zsafe_low, zsafe_high, nz)
 
 yg, zg = np.meshgrid(y, z)
 
+plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
+
 
 
 criterion = (data['Y'] > y_low) & (data['Y'] < y_high) & (data['Z'] > z_low) & (data['Z'] < z_high)
@@ -61,7 +63,6 @@ plt.xlabel('Y')
 plt.ylabel('Z')
 ax.scatter(data['Y'], data['Z'], c='blue', s=1)
 ax.scatter(circle_points[:,0], circle_points[:,1], c='red', s=2 )
-
 
 
 
