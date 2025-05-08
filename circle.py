@@ -82,8 +82,8 @@ for (a1,a2) in sector_angles:
             # print(( (p1[0]**2 + p1[1]**2) + (distance[0]**2 + distance[1]**2) - (l3_1[0]**2 + l3_1[1]**2)  )/ (2 * math.sqrt((p1[0]**2 + p1[1]**2))* math.sqrt((distance[0]**2 + distance[1]**2)) ))
 
             # Calculating the angles between our point and each of the 2 boundaries
-            angle_1 = math.acos(( (p1[0]**2 + p1[1]**2) + (distance[0]**2 + distance[1]**2) - (l3_1[0]**2 + l3_1[1]**2)  )/ (2 * math.sqrt((p1[0]**2 + p1[1]**2))* math.sqrt((distance[0]**2 + distance[1]**2)) ))
-            angle_2 = math.acos(( (p2[0]**2 + p2[1]**2) + (distance[0]**2 + distance[1]**2) - (l3_2[0]**2 + l3_2[1]**2)  )/ (2 * math.sqrt((p2[0]**2 + p2[1]**2))* math.sqrt((distance[0]**2 + distance[1]**2)) ))
+            angle_1 = math.acos(( (p1[0]**2 + p1[1]**2) + (distance[0]**2 + distance[1]**2) - (l3_1[0]**2 + l3_1[1]**2)  )/ (2.0 * math.sqrt((p1[0]**2 + p1[1]**2))* math.sqrt((distance[0]**2 + distance[1]**2)) ))
+            angle_2 = math.acos(( (p2[0]**2 + p2[1]**2) + (distance[0]**2 + distance[1]**2) - (l3_2[0]**2 + l3_2[1]**2)  )/ (2.0 * math.sqrt((p2[0]**2 + p2[1]**2))* math.sqrt((distance[0]**2 + distance[1]**2)) ))
 
             # 60 deg in rad
             angle = (2*pi*60)/360
@@ -105,11 +105,13 @@ colors = ['red', 'blue', 'green', 'orange', 'purple', 'brown']
 #Background points
 ax.scatter(data['Y'], data['Z'], c='grey', s=1, alpha=0.3)
 
-for i, sector_df in enumerate(sectors):
-    print(sector_df['Y'])
-    # ax.scatter(sector_df['Y'], sector_df['Z'],
-    #           c=colors[i], s=1,
-    #           label=f'Sector {i+1} ({sector_angles[i,0]:.0f}°-{sector_angles[i,1]:.0f}°)')
+for i, sector_points in enumerate(sectors):
+    y_vals = [row['Y'] for row in sector_points]
+    z_vals = [row['Z'] for row in sector_points]
+
+    ax.scatter(y_vals, z_vals,
+               c=colors[i], s=10,
+               label=f'Sector {i + 1} ({sector_angles[i, 0]:.0f}°-{sector_angles[i, 1]:.0f}°)')
 
 ax.scatter(circle_points[:,0], circle_points[:,1], c='black', s=1)
 ax.scatter([y0], [z0], c='black', s=10, marker='x')
