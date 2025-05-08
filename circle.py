@@ -29,6 +29,8 @@ z = np.linspace(zsafe_low, zsafe_high, nz)
 
 yg, zg = np.meshgrid(y, z)
 
+plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
+
 criterion = (data['Y'] > y_low) & (data['Y'] < y_high) & (data['Z'] > z_low) & (data['Z'] < z_high)
 data = data[criterion]
 random_point = data.sample()
