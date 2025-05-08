@@ -66,12 +66,4 @@ ax.scatter(circle_points[:,0], circle_points[:,1], c='red', s=2 )
 
 
 
-
-
-plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
-
-#circle generator check
-
-
-
 plt.show()                                                                                                                                                                                                           
