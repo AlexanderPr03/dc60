@@ -130,5 +130,7 @@ plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
 #circle generator check
 
 
+print(data)
+
 
 plt.show()                                                                                                                                                                                                           
