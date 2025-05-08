@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import math
 from math import pi as pi
+from math import pow as pow
 
 data = pd.read_csv('slice_csv_data.csv')
 
@@ -41,6 +42,8 @@ random_point = data.sample()
 y0 = random_point['Y'].values[0]
 z0 = random_point['Z'].values[0]
 
+criterion_2 = (data['Y'] > y0 - circle_radius) & (data['Y'] < y0 + circle_radius) & (data['Z'] > z0 - circle_radius) & (data['Z'] < z0 + circle_radius)
+data_circle = data[criterion_2].copy()
 circle_points = np.zeros(shape=(360,2))
 # print(circle_points[5])
 for i in range(0, 360):
@@ -57,41 +60,45 @@ for i in range(0, 360, 60):
     rad = math.radians(i)
     sector_angles[int(i/60)] = [i, (i+60) % 360]
 
-sectors = []
-for (a1,a2) in sector_angles:
-        sector_points = []
-        for (index, row) in data.iterrows():
-            distance = math.sqrt((row['Y'] - random_point['Y'].values[0]) ** 2 + (row['Z'] - random_point['Z'].values[0]) ** 2)
-            # Check if the distance from the center of the circle is lower than the radius of the circle
-            criteria_1 = (distance < circle_radius)
+sectors = [[],[],[],[],[],[]]
+# sector_points = [[],[],[],[],[],[]]
+for (index, row) in data_circle.iterrows():
+    i=0
+    for (a1,a2) in sector_angles:
+        distance = math.sqrt((row['Y'] - random_point['Y'].values[0]) ** 2 + (row['Z'] - random_point['Z'].values[0]) ** 2)
+        # Check if the distance from the center of the circle is lower than the radius of the circle
+        criteria_1 = (distance < circle_radius)
 
-            distance = np.array([row['Y'] - random_point['Y'].values[0], row['Z'] - random_point['Z'].values[0] ])
+        distance = np.array([row['Y'] - random_point['Y'].values[0], row['Z'] - random_point['Z'].values[0] ])
 
-            # p1 = (y0 + circle_radius * math.cos(math.radians((a1))), z0 + circle_radius * math.sin(math.radians((a1))))
-            # p2 = (y0 + circle_radius * math.cos(math.radians((a2))), z0 + circle_radius * math.sin(math.radians((a2))))
+        # p1 = (y0 + circle_radius * math.cos(math.radians((a1))), z0 + circle_radius * math.sin(math.radians((a1))))
+        # p2 = (y0 + circle_radius * math.cos(math.radians((a2))), z0 + circle_radius * math.sin(math.radians((a2))))
 
-            # The vectors that represent the radius boundaries of the sector
-            p1 = np.array([circle_radius * math.cos(math.radians((a1))), circle_radius * math.sin(math.radians((a1)))])
-            p2 = np.array([circle_radius * math.cos(math.radians((a2))), circle_radius * math.sin(math.radians((a2)))])
+        # The vectors that represent the radius boundaries of the sector
+        p1 = np.array([circle_radius * math.cos(math.radians((a1))), circle_radius * math.sin(math.radians((a1)))])
+        p2 = np.array([circle_radius * math.cos(math.radians((a2))), circle_radius * math.sin(math.radians((a2)))])
 
-            # The third length of the triangle
-            l3_1 = p1 - distance
-            l3_2 = p2 - distance
+        # The third length of the triangle
+        l3_1 = p1 - distance
+        l3_2 = p2 - distance
 
-            # The angle
-            # print(( (p1[0]**2 + p1[1]**2) + (distance[0]**2 + distance[1]**2) - (l3_1[0]**2 + l3_1[1]**2)  )/ (2 * math.sqrt((p1[0]**2 + p1[1]**2))* math.sqrt((distance[0]**2 + distance[1]**2)) ))
+        # The angle
+        # print(( (p1[0]**2 + p1[1]**2) + (distance[0]**2 + distance[1]**2) - (l3_1[0]**2 + l3_1[1]**2)  )/ (2 * math.sqrt((p1[0]**2 + p1[1]**2))* math.sqrt((distance[0]**2 + distance[1]**2)) ))
 
-            # Calculating the angles between our point and each of the 2 boundaries
-            angle_1 = math.acos(( (p1[0]**2 + p1[1]**2) + (distance[0]**2 + distance[1]**2) - (l3_1[0]**2 + l3_1[1]**2)  )/ (2.0 * math.sqrt((p1[0]**2 + p1[1]**2))* math.sqrt((distance[0]**2 + distance[1]**2)) ))
-            angle_2 = math.acos(( (p2[0]**2 + p2[1]**2) + (distance[0]**2 + distance[1]**2) - (l3_2[0]**2 + l3_2[1]**2)  )/ (2.0 * math.sqrt((p2[0]**2 + p2[1]**2))* math.sqrt((distance[0]**2 + distance[1]**2)) ))
+        # Calculating the angles between our point and each of the 2 boundaries
+        try:
+            angle_1 = math.acos(( (p1[0]**2 + p1[1]**2) + (distance[0]**2 + distance[1]**2) - (l3_1[0]**2 + l3_1[1]**2)  ) / (2.0 * math.sqrt((p1[0]**2 + p1[1]**2))* math.sqrt((distance[0]**2 + distance[1]**2)) ))
+            angle_2 = math.acos(( (p2[0]**2 + p2[1]**2) + (distance[0]**2 + distance[1]**2) - (l3_2[0]**2 + l3_2[1]**2)  ) / (2.0 * math.sqrt((p2[0]**2 + p2[1]**2))* math.sqrt((distance[0]**2 + distance[1]**2)) ))
+        except:
+            print('error')
+        # 60 deg in rad
+        angle = (2*pi*60)/360
+        criteria_2 = ((angle_1 < angle ) & (angle_2 < angle))
 
-            # 60 deg in rad
-            angle = (2*pi*60)/360
-            criteria_2 = ((angle_1 < angle ) & (angle_2 < angle))
+        if ((criteria_1) & criteria_2):
+            sectors[i].append(row)
 
-            if ((criteria_1) & criteria_2):
-                sector_points.append(row)
-        sectors.append(sector_points)
+        i+=1
 
 
 
@@ -110,7 +117,7 @@ for i, sector_points in enumerate(sectors):
     z_vals = [row['Z'] for row in sector_points]
 
     ax.scatter(y_vals, z_vals,
-               c=colors[i], s=10,
+               c=colors[i], s=1,
                label=f'Sector {i + 1} ({sector_angles[i, 0]:.0f}°-{sector_angles[i, 1]:.0f}°)')
 
 ax.scatter(circle_points[:,0], circle_points[:,1], c='black', s=1)
