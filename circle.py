@@ -15,6 +15,10 @@ data = pd.read_csv('slice_csv_data.csv')
 
 
 # Variable definitions
+rho = 1.225
+V_inf = 25
+p_d = 0.5 * rho * V_inf ** 2
+pt_theta_prev = 10 ** 9
 z_low = -0.53339
 step = 0.0000001
 z_high = 0.64874
@@ -34,8 +38,8 @@ Lz = abs(zsafe_high - zsafe_low)
 ny = int(round(Ly / hstep))
 nz = int(round(Lz / hstep))
 y = np.linspace(ysafe_low, ysafe_high, ny)
-z = np.linspace(zsafe_low, zsafe_high, nz*3)
-point_step = 1
+z = np.linspace(zsafe_low, zsafe_high, nz)
+
 
 # Creating the meshgrid
 yg, zg = np.meshgrid(y, z)
@@ -55,13 +59,21 @@ colors = ['red', 'blue', 'green', 'orange', 'purple', 'brown']
 # Background points
 ax.scatter(data['Y'], data['Z'], c='grey', s=1, alpha=0.3)
 
+#Create DC60 list + location
+DC60 = []
+zcheck = []
+ycheck = []
+
+
+
+
+# Main calculation loop
 for zz in range(0,len(z),pointstep):
     for yy in range(0,len(y),pointstep):
 
 
-# Main calculation loop
-for zz in range(0,len(z),point_step):
-    for yy in range(0,len(y),point_step):
+
+
 
         # Get point from meshgrid
         y0 = yg[zz][yy]
@@ -93,6 +105,9 @@ for zz in range(0,len(z),point_step):
 
         # Prepare an empty list with 6 other sublists that will store all of the points for each sector
         sectors = [[],[],[],[],[],[]]
+        #sectors[sector][]
+        #sectors[sector][point]
+        #sectors[sector][:][total pressure]
 
         # THIS IS A BLACK BOX
         # This is how we take every point and apply criteria to it so that we distribute it into one of the 6 sectors
@@ -134,22 +149,74 @@ for zz in range(0,len(z),point_step):
 
                 i+=1
 
+        #obtain DC60
 
-        # Just plotting stuff
-        for i, sector_points in enumerate(sectors):
-            y_vals = [row['Y'] for row in sector_points]
-            z_vals = [row['Z'] for row in sector_points]
+   
+    
 
-            ax.scatter(y_vals, z_vals,c=colors[i], s=1)
+    def getPressure(point):
+        return point[6]
+    
 
-        ax.scatter(circle_points[:,0], circle_points[:,1], c='black', s=1)
-        ax.scatter([y0], [z0], c='black', s=10, marker='x')
+    pressures = []
+
+    for i in range(6):
+        pressure = list(map(getPressure, sectors[i]))
+        pressures.append(pressure)
 
 
-        ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
-        plt.title(f'(Y={y0:.3f}, Z={z0:.3f})')
-        plt.tight_layout()
-        plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
+
+    circle_pt = np.array(pressures, dtype=object)
+
+    pt_ave = np.mean(circle_pt)
+    for i, sector_points in enumerate(sectors):
+
+        pt_theta = np.mean(circle_pt[i][:])
+
+        if pt_theta <= pt_theta_prev:
+             pt_theta_min = pt_theta
+
+
+         pt_theta_prev = pt_theta
+
+    dc60 = (pt_ave - pt_theta_min) / p_d
+
+    DC60.append(dc60)
+    #zcheck.append(zz)
+    #ycheck.append(yy)
+    #print(ycheck)
+
+    
+
+    # Just plotting stuff
+for i, sector_points in enumerate(sectors):
+    y_vals = [row['Y'] for row in sector_points]
+    z_vals = [row['Z'] for row in sector_points]
+
+    ax.scatter(y_vals, z_vals,c=colors[i], s=1)
+
+    ax.scatter(circle_points[:,0], circle_points[:,1], c='black', s=1)
+    ax.scatter([y0], [z0], c='black', s=10, marker='x')
+
+
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.title(f'(Y={y0:.3f}, Z={z0:.3f})')
+    plt.tight_layout()
+    plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
+
+
+
+idx = np.argsort(DC60)
+#print(idx[0][0])
+#print(ycheck)
+#yopt = ycheck[idx[0][0]]
+#zopt = zcheck[idx[0][0]]
+print(DC60)
+yopt = 0
+zopt = 0
+DC60_opt = min(DC60)
+print(f"The Optimal DC60 is {DC60_opt}, with location (y = {yopt}, z = {zopt}")
+
 
 plt.show()
 
@@ -172,24 +239,13 @@ if (make_heatmap):
     plt.show()
 
 
-#CODE FROM PHILIP
-#
-# rho = 1.225
-# V_inf = 25
-# p_d = 0.5 * rho * V_inf ** 2
-# pt_theta_prev = 10 ** 9
-#
-# for zpoint in range(len(zg)):
-#     for ypoint in range(len(yg)):
-#         circle_pt = 0  # array of total pressure values in circle circle_pt[i][j] = [sector][total pressure data]
-#         pt_ave = np.mean(circle_pt)
-#
-#         for i in range(5):
-#             pt_theta = np.mean(circle_pt[i])
-#
-#             if pt_theta <= pt_theta_prev:
-#                 pt_theta_min = pt_theta
-#
-#         pt_theta_prev = pt_theta
-#
-#     DC60 = (pt_ave - pt_theta_min) / p_d
+
+
+
+
+
+
+
+
+
+
