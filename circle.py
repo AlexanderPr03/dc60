@@ -25,6 +25,7 @@ ysafe_low = y_low + circle_radius
 zsafe_high = z_high - circle_radius
 zsafe_low = z_low + circle_radius
 hstep = 0.1
+pointstep = 3
 Ly = abs(ysafe_high - ysafe_low)
 Lz = abs(zsafe_high - zsafe_low)
 ny = int(round(Ly / hstep))
@@ -35,7 +36,7 @@ z = np.linspace(zsafe_low, zsafe_high, nz)
 
 yg, zg = np.meshgrid(y, z)
 
-plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
+
 
 criterion = (data['Y'] > y_low) & (data['Y'] < y_high) & (data['Z'] > z_low) & (data['Z'] < z_high)
 data = data[criterion]
@@ -44,13 +45,15 @@ fig, ax = plt.subplots()
 plt.xlabel('Y')
 plt.ylabel('Z')
 
+ax.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
+
 colors = ['red', 'blue', 'green', 'orange', 'purple', 'brown']
 
 # Background points
 ax.scatter(data['Y'], data['Z'], c='grey', s=1, alpha=0.3)
 
-for zz in range(0,len(z),3):
-    for yy in range(0,len(y),3):
+for zz in range(0,len(z),pointstep):
+    for yy in range(0,len(y),pointstep):
 
 
         y0 = yg[zz][yy]
@@ -137,6 +140,7 @@ for zz in range(0,len(z),3):
         plt.title(f'(Y={y0:.3f}, Z={z0:.3f})')
         plt.tight_layout()
         plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
+
 plt.show()
 
 #TRYING TO MAKE A HEATMAP OF PRESSURES
