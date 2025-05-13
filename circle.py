@@ -10,8 +10,11 @@ from math import pow as pow
 
 sns.set_theme()
 
+# Read the data
 data = pd.read_csv('slice_csv_data.csv')
 
+
+# Variable definitions
 z_low = -0.53339
 step = 0.0000001
 z_high = 0.64874
@@ -24,61 +27,69 @@ ysafe_high = y_high - circle_radius
 ysafe_low = y_low + circle_radius
 zsafe_high = z_high - circle_radius
 zsafe_low = z_low + circle_radius
-hstep = 0.1
+hstep = 0.4
 Ly = abs(ysafe_high - ysafe_low)
 Lz = abs(zsafe_high - zsafe_low)
 ny = int(round(Ly / hstep))
 nz = int(round(Lz / hstep))
 y = np.linspace(ysafe_low, ysafe_high, ny)
-z = np.linspace(zsafe_low, zsafe_high, nz)
+z = np.linspace(zsafe_low, zsafe_high, nz*3)
+point_step = 1
 
-
+# Creating the meshgrid
 yg, zg = np.meshgrid(y, z)
 
+# Preparing the plot
 plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
-
-criterion = (data['Y'] > y_low) & (data['Y'] < y_high) & (data['Z'] > z_low) & (data['Z'] < z_high)
-data = data[criterion]
-
 fig, ax = plt.subplots()
 plt.xlabel('Y')
 plt.ylabel('Z')
-
 colors = ['red', 'blue', 'green', 'orange', 'purple', 'brown']
-
 # Background points
 ax.scatter(data['Y'], data['Z'], c='grey', s=1, alpha=0.3)
 
-for zz in range(0,len(z),3):
-    for yy in range(0,len(y),3):
+# Filter the data from the big domain to the small rectangle
+criterion = (data['Y'] > y_low) & (data['Y'] < y_high) & (data['Z'] > z_low) & (data['Z'] < z_high)
+data = data[criterion]
 
 
+# Main calculation loop
+for zz in range(0,len(z),point_step):
+    for yy in range(0,len(y),point_step):
+
+        # Get point from meshgrid
         y0 = yg[zz][yy]
         z0 = zg[zz][yy]
-        # print(y0)
-        # print(z0)
+
+        # Filter the data so that we only use the values inside the circle where we calculate DC60 instead of iterating over every
+        # single point in the grid
         criterion_2 = (data['Y'] > y0 - circle_radius) & (data['Y'] < y0 + circle_radius) & (data['Z'] > z0 - circle_radius) & (data['Z'] < z0 + circle_radius)
         data_circle = data[criterion_2].copy()
         circle_points = np.zeros(shape=(360,2))
-        # print(circle_points[5])
+
+
+        # Around the central point, iterate over 360 degrees and save all the points that define a circle around that point
+        # inside of an array (basically we define the circle)
         for i in range(0, 360):
             rad = math.radians(i)
             rx = math.cos(rad) * circle_radius
             ry = math.sin(rad) * circle_radius
-            # print(circle_points[i].shape)
-
 
             circle_points[i,0:2] = [y0 + rx, z0 + ry]
 
         sector_angles = np.zeros((6, 2))
+
+        # Take the circle and divide it in 6 sectors
         for i in range(0, 360, 60):
             rad = math.radians(i)
             sector_angles[int(i/60)] = [i, (i+60) % 360]
 
+
+        # Prepare an empty list with 6 other sublists that will store all of the points for each sector
         sectors = [[],[],[],[],[],[]]
-        # sector_points = [[],[],[],[],[],[]]
 
         # THIS IS A BLACK BOX
+        # This is how we take every point and apply criteria to it so that we distribute it into one of the 6 sectors
         for (index, row) in data_circle.iterrows():
             i=0
             for (a1,a2) in sector_angles:
@@ -118,16 +129,12 @@ for zz in range(0,len(z),3):
                 i+=1
 
 
-
-
+        # Just plotting stuff
         for i, sector_points in enumerate(sectors):
             y_vals = [row['Y'] for row in sector_points]
             z_vals = [row['Z'] for row in sector_points]
 
-            ax.scatter(y_vals, z_vals,
-                       c=colors[i], s=1
-                       #label=f'Sector {i + 1} ({sector_angles[i, 0]:.0f}°-{sector_angles[i, 1]:.0f}°)'
-                       )
+            ax.scatter(y_vals, z_vals,c=colors[i], s=1)
 
         ax.scatter(circle_points[:,0], circle_points[:,1], c='black', s=1)
         ax.scatter([y0], [z0], c='black', s=10, marker='x')
