@@ -87,6 +87,10 @@ class DC60Calculator:
                 # Print column information for debugging
                 print(f"Columns in file: {list(df.columns)}")
                 
+                # Convert all columns to appropriate numeric types
+                for col in df.columns:
+                    df[col] = pd.to_numeric(df[col], errors='coerce')
+                
                 # Map the columns based on what we saw in the data file
                 flow_data = {
                     'x': df['X'].values,
@@ -144,6 +148,7 @@ class DC60Calculator:
         flow_data = {
             'x': X.flatten(),
             'y': Y.flatten(),
+            'z': np.zeros_like(X.flatten()),  # Adding Z coordinate for consistency
             'total_pressure': total_pressure.flatten(),
             'static_pressure': static_pressure.flatten(),
             'density': density.flatten(),
@@ -325,14 +330,18 @@ class DC60Calculator:
                 
                 if self.debug_mode:
                     # Print some basic statistics about the loaded data
-                    print(f"\n  Data statistics for slice {slice_idx}, AoA {aoa}:")
-                    print(f"    Number of data points: {len(flow_data['x'])}")
-                    print(f"    X range: [{min(flow_data['x']):.3f}, {max(flow_data['x']):.3f}]")
-                    print(f"    Y range: [{min(flow_data['y']):.3f}, {max(flow_data['y']):.3f}]")
-                    if 'z' in flow_data:
-                        print(f"    Z range: [{min(flow_data['z']):.3f}, {max(flow_data['z']):.3f}]")
-                    print(f"    Total pressure range: [{min(flow_data['total_pressure']):.3f}, {max(flow_data['total_pressure']):.3f}]")
-                    print(f"    Flow speed range: [{min(flow_data['flow_speed']):.3f}, {max(flow_data['flow_speed']):.3f}]")
+                    try:
+                        print(f"\n  Data statistics for slice {slice_idx}, AoA {aoa}:")
+                        print(f"    Number of data points: {len(flow_data['x'])}")
+                        print(f"    X range: [{min(flow_data['x']):.3f}, {max(flow_data['x']):.3f}]")
+                        print(f"    Y range: [{min(flow_data['y']):.3f}, {max(flow_data['y']):.3f}]")
+                        if 'z' in flow_data:
+                            print(f"    Z range: [{min(flow_data['z']):.3f}, {max(flow_data['z']):.3f}]")
+                        print(f"    Total pressure range: [{min(flow_data['total_pressure']):.3f}, {max(flow_data['total_pressure']):.3f}]")
+                        print(f"    Flow speed range: [{min(flow_data['flow_speed']):.3f}, {max(flow_data['flow_speed']):.3f}]")
+                    except Exception as e:
+                        print(f"    Error printing data statistics: {e}")
+                        print("    This might indicate issues with data types in the loaded data.")
                 
                 # Generate grid points for this slice
                 grid_points = self.generate_grid_points(slice_idx)
