@@ -153,7 +153,7 @@ for zz in range(0,len(z),pointstep):
 
    
     
-
+''''
     def getPressure(point):
         return point[6]
     
@@ -182,9 +182,9 @@ for zz in range(0,len(z),pointstep):
     dc60 = (pt_ave - pt_theta_min) / p_d
 
     DC60.append(dc60)
-    #zcheck.append(zz)
-    #ycheck.append(yy)
-    #print(ycheck)
+    zcheck.append(zz)
+    ycheck.append(yy)
+'''
 
     
 
@@ -205,18 +205,14 @@ for i, sector_points in enumerate(sectors):
     plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
 
 
-
+''''
 idx = np.argsort(DC60)
-#print(idx[0][0])
-#print(ycheck)
-#yopt = ycheck[idx[0][0]]
-#zopt = zcheck[idx[0][0]]
-print(DC60)
-yopt = 0
-zopt = 0
-DC60_opt = min(DC60)
-print(f"The Optimal DC60 is {DC60_opt}, with location (y = {yopt}, z = {zopt}")
 
+yopt = ycheck[idx[0]]
+zopt = zcheck[idx[0]]
+DC60_opt = DC60[idx[0]]
+print(f"The Optimal DC60 is {DC60_opt}, with location (y = {yopt}, z = {zopt}")
+'''
 
 plt.show()
 
