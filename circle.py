@@ -151,9 +151,20 @@ for zz in range(0,len(z),pointstep):
 
         #obtain DC60
 
+    #def getPressure(point):
+      #  return point[6]
+    
+
+   # pressures = []
+
+    #for i in range(6):
+      #  pressure = list(map(getPressure, sectors[i]))
+     #   pressures.append(pressure)
+
+    #print(sectors)
    
     
-''''
+
     def getPressure(point):
         return point[6]
     
@@ -164,27 +175,33 @@ for zz in range(0,len(z),pointstep):
         pressure = list(map(getPressure, sectors[i]))
         pressures.append(pressure)
 
+    print(pressures)
 
 
-    circle_pt = np.array(pressures, dtype=object)
-
-    pt_ave = np.mean(circle_pt)
-    for i, sector_points in enumerate(sectors):
-
-        pt_theta = np.mean(circle_pt[i][:])
-
+    circle_pt = pressures
+    c = 0
+    pt_ave = 0
+    #print(type(circle_pt))
+    for i in range(6):
+        #print(circle_pt[i])
+        s = circle_pt[i]
+        pt_theta = np.mean(s)
+        pt_ave = pt_ave + pt_theta
         if pt_theta <= pt_theta_prev:
-             pt_theta_min = pt_theta
+            pt_theta_min = pt_theta
 
 
-         pt_theta_prev = pt_theta
+        pt_theta_prev = pt_theta
+        c = c + 1
+
 
     dc60 = (pt_ave - pt_theta_min) / p_d
+    pt_ave = pt_ave / c
 
     DC60.append(dc60)
     zcheck.append(zz)
     ycheck.append(yy)
-'''
+
 
     
 
@@ -205,14 +222,17 @@ for i, sector_points in enumerate(sectors):
     plt.plot(yg, zg, marker = 'o', color = 'k', linestyle = 'none')
 
 
-''''
-idx = np.argsort(DC60)
 
-yopt = ycheck[idx[0]]
-zopt = zcheck[idx[0]]
-DC60_opt = DC60[idx[0]]
-print(f"The Optimal DC60 is {DC60_opt}, with location (y = {yopt}, z = {zopt}")
+idx = np.argmin(DC60)
+
+#yopt = ycheck[idx[0]]
+#zopt = zcheck[idx[0]]
+DC60_opt = DC60[idx]
+print(f"The Optimal DC60 is {DC60_opt}, with location (y = , z = ")
+plt.show()
 '''
+
+
 
 plt.show()
 
@@ -234,7 +254,7 @@ if (make_heatmap):
     plt.ylabel('Z')
     plt.show()
 
-
+'''
 
 
 
